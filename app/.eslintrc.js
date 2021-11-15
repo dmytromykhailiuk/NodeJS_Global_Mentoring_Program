@@ -29,6 +29,10 @@ module.exports = {
     'import/extensions': 'off',
     'no-shadow': 'off',
     'no-unused-vars': 'off',
+    'class-methods-use-this': 'off',
+    'no-useless-constructor': 'off',
+    'consistent-return': 'off',
+    'no-empty-function': 'off',
     'prettier/prettier': [
       1,
       {

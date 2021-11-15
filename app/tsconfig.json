@@ -3,6 +3,8 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "target": "es6",
+    "types": [ "node" ],
+    "typeRoots": [ "../node_modules/@types" ],
     "noImplicitAny": true,
     "strict": true,
     "strictNullChecks": false,
@@ -13,6 +15,5 @@
     "paths": {
     "*": ["node_modules/*"]
     }
-  },
-  "include": ["src/**"]
+  }
 }

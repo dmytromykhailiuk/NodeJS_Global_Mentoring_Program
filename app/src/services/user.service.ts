@@ -1,55 +1,41 @@
-import { v4 as uuidv4 } from 'uuid';
 import { IUser } from '../interfaces';
 import { UserDTO } from '../dto';
+import { userModel, BaseCRUDModel } from '../models';
 
 class UserService {
-  private users: IUser[] = [];
+  private readonly DEFAULT_LIMIT = 10_000;
+
+  private readonly DEFAULT_LOGIN_SUBSTRING = '';
+
+  constructor(private userData: BaseCRUDModel<IUser, UserDTO>) {}
 
   getUsers(
-    limit: number = this.users.length,
-    loginSubstring: string = ''
-  ): IUser[] {
-    return this.filterUsersByLoginSubstring(loginSubstring).slice(0, limit);
+    limit: number = this.DEFAULT_LIMIT,
+    loginSubstring: string = this.DEFAULT_LOGIN_SUBSTRING
+  ): Promise<IUser[]> {
+    return this.userData.readAll({ limit, searchSubstring: loginSubstring });
   }
 
-  getUserById(id: string): IUser {
-    return this.users.find((user) => user.id === id);
+  getUserById(id: string): Promise<IUser> {
+    return this.userData.readOne(id);
   }
 
-  createUser(userDTO: UserDTO): IUser {
-    const newUser: IUser = {
-      ...userDTO,
-      id: uuidv4(),
-      isDeleted: false,
-    };
-    this.users.push(newUser);
-    return newUser;
+  createUser(userDTO: UserDTO): Promise<IUser> {
+    return this.userData.create(userDTO);
   }
 
-  updateUser(userData: UserDTO, userID: string): IUser {
-    const index = this.users.findIndex((user) => user.id === userID);
-    const updatedUser = { ...this.users[index], ...userData };
-    this.users[index] = updatedUser;
-    return updatedUser;
+  updateUser(userData: UserDTO, userID: string): Promise<IUser> {
+    return this.userData.update(userData, userID);
   }
 
-  deleteUser(id: string): IUser {
-    const index = this.users.findIndex((user) => user.id === id);
-    this.users[index].isDeleted = true;
-    return this.users[index];
+  deleteUser(id: string): Promise<IUser> {
+    return this.updateUser({ isDeleted: true } as any, id);
   }
 
-  isExistingLogin(login: string): boolean {
-    return this.users.some((user) => user.login === login);
-  }
-
-  isExistingID(id: string): boolean {
-    return this.users.some((user) => user.id === id);
-  }
-
-  private filterUsersByLoginSubstring(loginSubstring: string): IUser[] {
-    return this.users.filter((user) => user.login.includes(loginSubstring));
+  async isExistingID(id: string): Promise<boolean> {
+    const user: IUser = await this.getUserById(id);
+    return Boolean(user);
   }
 }
 
-export default new UserService();
+export default new UserService(userModel);
