@@ -1,15 +1,23 @@
 import express, { Application } from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import { userRouter } from './user';
-import { APPLICATION_API as API } from './config';
+import { APPLICATION_API as API, sequelize } from './config';
 import { DEFAULT_PORT } from './common';
 
-const app: Application = express();
+(async () => {
+  const PORT = process.env.PORT || DEFAULT_PORT;
 
-app.use(bodyParser.json());
+  const app: Application = express();
 
-app.use(`/${API.user}`, userRouter);
+  app.use(cors());
+  app.use(bodyParser.json());
+  app.use(`/${API.user}`, userRouter);
 
-app.listen(DEFAULT_PORT, () => {
-  console.log(`Server running on port ${DEFAULT_PORT}`);
-});
+  await sequelize.authenticate();
+  await sequelize.sync();
+
+  app.listen(PORT || DEFAULT_PORT, () =>
+    console.log(`Server running on port ${PORT}`)
+  );
+})();

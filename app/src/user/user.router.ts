@@ -18,28 +18,9 @@ userRouter.get(
   userController.getUsers as DefaultMiddleware
 );
 
-userRouter.get(
-  `/:${ID}`,
-  Validator.isExistingUserID(
-    createErrorMiddleware({
-      message: ErrorMessage.USER_DOESNT_EXISTS,
-      statusCode: StatusCode.NOT_FOUND,
-    })
-  ),
-  userController.getUserByID
-);
+userRouter.get(`/:${ID}`, userController.getUserByID);
 
-userRouter.post(
-  '/',
-  userBodyValidator,
-  Validator.isExistingUserLogin(
-    createErrorMiddleware({
-      message: ErrorMessage.USER_WITH_SAME_LOGIN_ALREADY_EXISTS,
-      statusCode: StatusCode.CONFLICT,
-    })
-  ),
-  userController.createUser
-);
+userRouter.post('/', userBodyValidator, userController.createUser);
 
 userRouter.put(
   `/:${ID}`,
