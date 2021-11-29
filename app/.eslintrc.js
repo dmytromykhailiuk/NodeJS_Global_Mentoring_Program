@@ -33,6 +33,7 @@ module.exports = {
     'no-useless-constructor': 'off',
     'consistent-return': 'off',
     'no-empty-function': 'off',
+    'no-restricted-syntax': 'off',
     'prettier/prettier': [
       1,
       {

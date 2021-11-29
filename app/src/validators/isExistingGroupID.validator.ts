@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { ID } from '../common';
-import userService from '../services/user.service';
+import { groupService } from '../services';
 
-export const isExistingUserID =
+export const isExistingGroupID =
   (errorCallback: (req: Request, res: Response, next: NextFunction) => void) =>
   async (req: Request<{ [ID]: string }>, res: Response, next: NextFunction) => {
-    const isExistingUserID = await userService.isExistingID(req.params.id);
+    const isExistingUserID = await groupService.isExistingID(req.params.id);
     if (isExistingUserID) {
       next();
     } else {

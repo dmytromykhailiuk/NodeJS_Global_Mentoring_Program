@@ -1,14 +1,56 @@
+import { ModelCtor, Model, Op, Transaction } from 'sequelize';
+
 export abstract class BaseCRUDModel<T, S> {
-  abstract create(data: S): Promise<T>;
+  constructor(
+    private table: ModelCtor<Model<any, any>>,
+    private relation: any
+  ) {}
 
-  abstract readOne(id: string): Promise<T>;
+  async create(data: S, transaction?: Transaction): Promise<T> {
+    return this.table.create(data, transaction ? { transaction } : {}) as any;
+  }
 
-  abstract readAll(options: {
+  async readAll({
+    limit,
+    searchSubstring,
+    propertyName,
+  }: {
     limit?: number;
+    propertyName: string;
     searchSubstring?: string;
-  }): Promise<T[]>;
+  }): Promise<T[]> {
+    return this.table.findAll({
+      limit,
+      where: {
+        [propertyName]: {
+          [Op.like]: `%${searchSubstring || ''}%`,
+        },
+      },
+      include: this.relation,
+    }) as any;
+  }
 
-  abstract update(data: S, id: string): Promise<T>;
+  async readOne(propertyName: string, value: string): Promise<T> {
+    return this.table.findOne({
+      where: { [propertyName]: value },
+      include: this.relation,
+    }) as any;
+  }
 
-  abstract delete(id: string): Promise<void>;
+  async update(
+    data: S,
+    propertyName: string,
+    value: string,
+    transaction?: Transaction
+  ): Promise<T> {
+    return this.table
+      .findOne({ where: { [propertyName]: value }, include: this.relation })
+      .then((user) =>
+        user.update(data, transaction ? { transaction } : {})
+      ) as any;
+  }
+
+  async delete(propertyName: string, value: string): Promise<void> {
+    await this.table.destroy({ where: { [propertyName]: value } });
+  }
 }
