@@ -1,4 +1,5 @@
 import { Response, Request } from 'express';
+import { logger } from '../../config';
 
 interface ICreateErrorMiddlewareProps {
   message: string;
@@ -7,7 +8,10 @@ interface ICreateErrorMiddlewareProps {
 
 export const createErrorMiddleware =
   ({ message, statusCode }: ICreateErrorMiddlewareProps) =>
-  (_: Request, res: Response) => {
+  (req: Request, res: Response) => {
+    logger.error(
+      `${statusCode} - ${req.originalUrl} - ${req.method} - message: ${message}`
+    );
     res.status(statusCode);
     res.json({
       message,

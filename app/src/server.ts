@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { userRouter } from './user';
 import { groupRouter } from './group';
-import { APPLICATION_API as API, sequelize } from './config';
+import { APPLICATION_API as API, sequelize, logger } from './config';
 import { DEFAULT_PORT } from './common';
 
 (async () => {
@@ -16,10 +16,18 @@ import { DEFAULT_PORT } from './common';
   app.use(`/${API.user}`, userRouter);
   app.use(`/${API.group}`, groupRouter);
 
-  await sequelize.authenticate();
-  await sequelize.sync();
+  try {
+    await sequelize.authenticate();
+    await sequelize.sync();
 
-  app.listen(PORT || DEFAULT_PORT, () =>
-    console.log(`Server running on port ${PORT}`)
-  );
+    app.listen(PORT || DEFAULT_PORT, () =>
+      console.log(`Server running on port ${PORT}`)
+    );
+  } catch (e) {
+    logger.error(`500 - Creating server failed: ${e}`);
+  }
 })();
+
+process.on('uncaughtException', (err, origin) => {
+  logger.error(`500 - Creating server failed: ${err}, ${origin}`);
+});

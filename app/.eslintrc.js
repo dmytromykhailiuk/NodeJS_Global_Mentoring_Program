@@ -34,6 +34,8 @@ module.exports = {
     'consistent-return': 'off',
     'no-empty-function': 'off',
     'no-restricted-syntax': 'off',
+    'func-names': 'off',
+    'no-param-reassign': 'off',
     'prettier/prettier': [
       1,
       {
